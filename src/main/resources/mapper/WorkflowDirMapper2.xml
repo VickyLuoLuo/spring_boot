@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quark.data.rapid.server.mapper.WorkflowDirMapper2">
+	<select id="getWorkDirListByParentId" parameterType="java.lang.Long"
+		resultType="com.quark.data.rapid.server.model.WorkflowDir">
+		SELECT dir.id, dir.parent_id parentId, dir.data_stream_workflow_id dataStreamWorkflowId, dir.type type, dir.`name` name
+		FROM data_stream_workflow_dir dir
+		LEFT JOIN data_stream_workflow workflow ON dir.data_stream_workflow_id = workflow.id
+		WHERE parent_id = #{id}
+		ORDER BY workflow.create_time ASC
+	</select>
+</mapper>

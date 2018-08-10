@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quark.data.rapid.server.mapper.RuntimeEnvMapper2">
+    <resultMap id="BaseResultMap" type="com.quark.data.rapid.server.model.RunTimeEnv">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="runtime_type" jdbcType="CHAR" property="runtimeType" />
+        <result column="runtime_name" jdbcType="VARCHAR" property="runtimeName" />
+        <result column="runtime_ip" jdbcType="VARCHAR" property="runtimeIp" />
+        <result column="runtime_port" jdbcType="INTEGER" property="runtimePort" />
+        <result column="runtime_username" jdbcType="VARCHAR" property="runtimeUsername" />
+        <result column="runtime_password" jdbcType="VARCHAR" property="runtimePassword" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+    <resultMap id="StatisticsResultMap" type="com.quark.data.rapid.server.model.vo.WorkflowEnvVO">
+        <result column="runtime_name" jdbcType="VARCHAR" property="runtimeEnvName" />
+        <result column="runtime_ip" jdbcType="VARCHAR" property="runtimeEnvIp" />
+        <result column="workflow_inst_id" jdbcType="BIGINT" property="workflowInstId" />
+        <result column="status" jdbcType="CHAR" property="status" />
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    </resultMap>
+
+    <select id="getRuntimeEnvByWorkflowId" parameterType="map" resultMap="StatisticsResultMap">
+        select
+          rte.runtime_name, rte.runtime_ip,wfi.id as workflow_inst_id,wfi.status, wfi.start_time
+        from
+          data_stream_runtime_env rte
+        left join
+          data_stream_workflow_inst wfi ON rte.id = wfi.runtime_env_id
+        and wfi.data_stream_workflow_id = #{workflowId,jdbcType=BIGINT}
+        and wfi.is_del = 0;
+    </select>
+</mapper>

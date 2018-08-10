@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quark.data.rapid.server.mapper.WorkflowNodeMapper2">
+  <resultMap id="BaseResultMap" type="com.quark.data.rapid.server.model.WorkflowNode">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="data_stream_workflow_id" jdbcType="BIGINT" property="dataStreamWorkflowId" />
+    <result column="data_stream_node_template_id" jdbcType="BIGINT" property="dataStreamNodeTemplateId" />
+    <result column="workflow_node_name" jdbcType="VARCHAR" property="workflowNodeName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="create_user" jdbcType="BIGINT" property="createUser" />
+    <result column="update_user" jdbcType="BIGINT" property="updateUser" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.quark.data.rapid.server.model.WorkflowNodeWithBLOBs">
+    <result column="workflow_node_json_value" jdbcType="LONGVARCHAR" property="workflowNodeJsonValue" />
+    <result column="workflow_node_json_metadata" jdbcType="LONGVARCHAR" property="workflowNodeJsonMetadata" />
+  </resultMap>
+
+  <resultMap id="DataStreamWorkflowInst" type="com.quark.data.rapid.server.model.WorkflowInst">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="workflow_inst_name" jdbcType="VARCHAR" property="workflowInstName" />
+  </resultMap>
+
+  <sql id="RunTime">
+    id, workflow_inst_name
+  </sql>
+
+  <select id="getSourceNode" parameterType="map" resultMap="ResultMapWithBLOBs">
+    SELECT
+      *
+    FROM
+      data_stream_workflow_node
+    where
+      data_stream_workflow_id = #{workflowId,jdbcType=BIGINT}
+    and
+      data_stream_node_template_id
+    in
+      (
+      select
+        id
+      from
+        data_stream_node_template
+      where
+        node_type = 0
+      )
+  </select>
+
+  <select id="getProcessNode" parameterType="map" resultMap="ResultMapWithBLOBs">
+    SELECT
+      *
+    FROM
+      data_stream_workflow_node
+    where
+      data_stream_workflow_id = #{workflowId,jdbcType=BIGINT}
+    and
+      data_stream_node_template_id
+    in
+      (
+      select
+        id
+      from
+        data_stream_node_template
+      where
+        node_type = 1
+      )
+  </select>
+
+  <select id="getSinkNode" parameterType="map" resultMap="ResultMapWithBLOBs">
+    SELECT
+      *
+    FROM
+      data_stream_workflow_node
+    where
+      data_stream_workflow_id = #{workflowId,jdbcType=BIGINT}
+    and
+      data_stream_node_template_id
+    in
+      (
+      select
+        id
+      from
+        data_stream_node_template
+      where
+        node_type = 2
+      )
+  </select>
+
+  <select id="getRunTimes" parameterType="map" resultMap="DataStreamWorkflowInst">
+    select
+      <include refid="RunTime"/>
+    from
+      data_stream_workflow_inst
+    where
+      data_stream_workflow_id = #{workflowId,jdbcType=BIGINT}
+  </select>
+</mapper>
